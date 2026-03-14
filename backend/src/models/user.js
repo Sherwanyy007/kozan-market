@@ -13,7 +13,19 @@ const userSchema = new mongoose.Schema(
     houseNumber: { type: Number, default: null },
     addressDetails: { type: String, default: "" },
 
+    addressType: { type: String, default: "house" },
+buildingName: { type: String, default: "" },
+apartmentNumber: { type: String, default: "" },
+floor: { type: String, default: "" },
+street: { type: String, default: "" },
+additionalDirections: { type: String, default: "" },
+lat: { type: Number, default: null },
+lng: { type: Number, default: null },
+googleMapsLink: { type: String, default: "" },
+
     isAdmin: { type: Boolean, default: false },
+    resetPasswordToken: String,
+resetPasswordExpire: Date,
   },
   { timestamps: true }
 )

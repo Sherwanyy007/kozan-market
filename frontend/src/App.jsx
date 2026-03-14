@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
+import { useNavigate } from "react-router-dom";
 
 function App() {
 
@@ -24,6 +25,9 @@ const [city, setCity] = useState("Erbil")
 const [notes, setNotes] = useState("")
 const [paymentMethod, setPaymentMethod] = useState("cash")
 const totalPrice = cart.reduce((sum, item) => sum + item.price * item.qty, 0)
+const navigate = useNavigate();
+
+
 
 const placeOrder = async () => {
   try {
@@ -32,28 +36,42 @@ const placeOrder = async () => {
       return
     }
 
-    const res = await axios.post("http://localhost:5000/api/orders", {
+    const savedAddress = JSON.parse(localStorage.getItem("savedAddress"))
+    localStorage.removeItem("cart")
+
+    const orderData = {
       customerName,
-      phone,
-      address,
+      phone: savedAddress?.phone || phone,
+      address: savedAddress?.street || address,
       city,
       notes,
       paymentMethod,
       orderItems: cart,
       totalPrice,
-    })
+
+      addressType: savedAddress?.addressType || "",
+      buildingName: savedAddress?.buildingName || "",
+      apartmentNumber: savedAddress?.apartmentNumber || "",
+      floor: savedAddress?.floor || "",
+      street: savedAddress?.street || "",
+      additionalDirections: savedAddress?.additionalDirections || "",
+      lat: savedAddress?.lat || null,
+      lng: savedAddress?.lng || null,
+      googleMapsLink: savedAddress?.googleMapsLink || "",
+    }
+
+    const res = await axios.post("http://localhost:5000/api/orders", orderData)
 
     console.log(res.data)
-
-    alert("Order placed successfully")
-
-    setCart([])
-    setCustomerName("")
-    setPhone("")
-    setAddress("")
-    setCity("Erbil")
-    setNotes("")
-    setPaymentMethod("cash")
+alert("Order placed successfully")
+setCart([])
+setCustomerName("")
+setPhone("")
+setAddress("")
+setCity("Erbil")
+setNotes("")
+localStorage.removeItem("cart")
+navigate("/market")
   } catch (error) {
     console.log(error)
     alert("Failed to place order")
